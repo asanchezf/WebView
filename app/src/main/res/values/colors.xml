@@ -3,7 +3,12 @@
     <!-- google's material design colours from
     http://www.google.com/design/spec/style/color.html#color-ui-color-palette -->
     <!--reds-->
-
+    <color name="primary">@color/md_yellow_400</color>
+    <color name="primary_dark">@color/md_yellow_600</color>
+    <color name ="accent">@color/md_deep_purple_100</color>
+    <color name="primary_text">#212121</color>
+    <color name="primary_text_toolbar">#FFFFFF</color>
+    <!--<color name="window_background">#FFF5F5F5</color>-->
 
     <color name="colorPrimary">@color/md_indigo_500</color>
     <color name="colorPrimaryDark">@color/md_indigo_500</color>
