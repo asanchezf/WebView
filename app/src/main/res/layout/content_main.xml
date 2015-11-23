@@ -24,13 +24,15 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Don Quijote de la Mancha"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                android:text="@string/titulo_cardView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/md_yellow_900"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/donquijote" />
+                android:text="@string/donquijote"
+                android:textColor="@color/md_yellow_900"/>
 
 
             <!--<EditText-->

@@ -1,21 +1,59 @@
 package com.antonioejemplos.webview;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    /*http://www.vinidsl.com/android/collapsing-toolbar-layout/
+    Lo primero las dependencias:
+compile 'com.android.support:design:22.2.0'
+compile 'com.android.support:appcompat-v7:22.2.0'
+compile 'com.android.support:cardview-v7:22.2.0'
+    El primero en ser presentado será el CoordinatorLayout, android design library introduce este l
+    ayout que provee un nivel adicional de control sobre los eventos touch entre los child’s(hijos),
+    algo que muchos componentes de la librería aprovechan de gran manera. Este sera el layout principal,
+    y dentro de el armaremos todo el resto:
+
+
+El segundo en ser presentado será el AppBarLayout, que en si no es mas que un vertical LinearLayout que implementa muchos de los conceptos de material design de app bar como ser los gestos de scroll.
+Esta vista depende extremadamente de usar un “child”(hijo) directo (como el ScrollView) con un CoordinatorLayout, si se utiliza otro tipo de ViewGroup, la mayor parte de su funcionalidad no funcionará.
+
+Cuando agregamos un Toolbar a un AppBarLayout se nos da acceso a los flags de scroll, para este ejemplo usaremos dos de ellos:
+
+exitUntilCollapse: Este flag hace que el AppBar realice un scrollOff hasta que llegue al tamaño del toolbar, ahí se detendrá y dejara de hacer scroll quedando solamente nuestro toolbar.
+scroll: Este flag debe estar en todas las vistas que van a hacer un “offScreen”, las que no contengan este flag, se mantendran en la parte superio de la pantalla.
+Además de esto necesitaremos indicar como van a reaccionar algunas vistan cuando se haga el scroll, para eso usaremos CollapsingToolbarLayout.
+
+CollapsingToolbarLayout es una envoltura (wrapper) para el Toolbar que implementa las funcionalidades de colapsar el AppBar, esta destinado a ser usado como “child”(hijo) directo del AppBarLayout.
+Esta configuración del Toolbar app:layout_collapseMode=”pin” indica que el toolbar estara siempre visible.
+
+Cuando se utiliza el Toolbar junto al CollapsingToolbarLayout, el titulo automáticamente aparece largo cuando se hace scroll maximo hacia abajo, y se acomoda al toolbar clavado cuando se colapsa al hacer scroll hacia arriba.
+En la configuración del ImageView app:layout_collapseMode=”parallax” indica que cuando el toolbar se colapse, la imagen lo haga en modo parallax, es decir que lo haga a una velocidad diferente para darle una animación mas elegante.
+
+Necesitamos declarar el contenido que estará debajo el toolbar, para esto, la vista que estará debajo debe llevar una configuración especial:
+La configuración app:layout_behavior=”@string/appbar_scrolling_view_behavior” le indica al CoordinatorLayout que esta vista es la que estará bajo el AppBar.
+
+Para finalizar agregamos un FloatingActionButton al AppBarLayout.
+La configuración layout_anchor y layout_anchorGravity se utilizan para colocar componentes flotantes, como en este caso el FloatingActionButton relativo hacia otra view, en este caso nuestro AppBar, al realizar esto, podremos apreciar que cuando el AppBar se colapsa, este botón desaparece.
+
+
+
+    * */
 
     private EditText txtBuscar;
     private Button btnBuscar;
@@ -33,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar.setTitle(getString(R.string.app_name));
 
 
-        txtBuscar=(EditText)findViewById(R.id.txtBuscar);
+        txtBuscar=(EditText)findViewById(R.id.txtbuscar);
 //        InputMethodManager imm = (InputMethodManager)getSystemService(
 //                Context.INPUT_METHOD_SERVICE);
 //        //check if no view has focus:
@@ -61,10 +99,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                wbBuscar.loadUrl("http://lema.rae.es/drae/srv/search?val=" + txtBuscar.getText().toString().toLowerCase(Locale.getDefault()));
-
-//                Snackbar.make(v, "Navega por la pantalla para ver el resultado de la búsqueda...", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+                devolverBusqueda();
             }
         });
 
@@ -72,39 +107,38 @@ public class MainActivity extends AppCompatActivity {
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                devolverBusqueda();
 
-                wbBuscar.loadUrl("http://lema.rae.es/drae/srv/search?val=" + txtBuscar.getText().toString().toLowerCase(Locale.getDefault()));
-
-//                Snackbar.make(view, "Navega por la pantalla para ver el resultado de la búsqueda...", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
 
             }
         });
 
 
+    }
+
+    public void devolverBusqueda(){
+
+        wbBuscar.loadUrl("http://lema.rae.es/drae/srv/search?val=" + txtBuscar.getText().toString().toLowerCase(Locale.getDefault()));
+
+
+        // Forzamos el webview para que abra los enlaces internos dentro de la la APP
+        wbBuscar.setWebViewClient(new WebViewClient());
+        // Forzamos el webview para que abra los enlaces externos en el navegador
+        wbBuscar.setWebViewClient(new MyAppWebViewClient());
+
+        //Lineas para ocultar el teclado virtual (Hide keyboard)
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(txtBuscar.getWindowToken(), 0);
+        txtBuscar.setText("");
+
+//                Snackbar.make(view, "Navega por la pantalla para ver el resultado de la búsqueda...", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
-    }
+
 }
